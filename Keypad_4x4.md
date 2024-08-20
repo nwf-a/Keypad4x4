@@ -10,17 +10,15 @@ The 4x4 keypad has 8 pins: 4 for the rows and 4 for the columns. Connect these p
 
 - Keypad Pins: The first 4 pins correspond to the rows, and the next 4 correspond to the columns
 
-<div style="display: flex; justify-content: space-between;">
-    <img src="Images\Keypad_pinout.jpg" alt="pinout-keypad" style="max-width: 60%; height: auto; margin-right: 5px;">
-    <img src="Images\keypad_arrangement.jpg" alt="arrangement-keypad" style="max-width: 40%; height: auto;">
-</div>
+| Keypad Pinout | Keypad Arrangement |
+|---------------|--------------------|
+|![Keypad Pinout](Images/Keypad_pinout.jpg) | ![Keypad Arrangement](Images/keypad_arrangement.jpg) |
 
 - Raspberry Pi GPIO Pins: Connect the keypad to any GPIO pins, but for this example, use the following configuration:
 
-<div style="display: flex; flex-direction: column; align-items: center; gap: 5px; margin-bottom: 20px;">
-    <img src="Images\Raspberry-Pi-3B+-GPIO-Pinout-Diagram.png" alt="pinout-diagram-RPi3B+" style="max-width: 100%; height: auto;">
-    <img src="Images\GPIO.png" alt="pinout-GPIO" style="max-width: 100%; height: auto;">
-</div>
+ ![RPi GPIO Pinout](Images/Raspberry-Pi-3B+-GPIO-Pinout-Diagram.png) 
+ 
+ ![GPIO Mapping](Images/GPIO.png)
 
 | **Keypad Pins** | **Raspberry Pi GPIO Pins** |
 |-------------|------------------------|
