@@ -60,25 +60,27 @@ class Keypad:
         GPIO.setwarnings(False)
         GPIO.setmode(GPIO.BCM)
 
-        # Set up rows as outputs and set them to high
-        for row in self.ROWS:
-            GPIO.setup(row, GPIO.OUT)
-            GPIO.output(row, GPIO.HIGH)
-
-        # Set up columns as inputs with pull-down resistors
+        # Set column as outputs and set them to high
         for col in self.COLS:
-            GPIO.setup(col, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+            GPIO.setup(col, GPIO.OUT)
+            GPIO.output(col, GPIO.HIGH)
+
+        # Set up row as inputs with pull-up resistors
+        for row in self.ROWS:
+            GPIO.setup(row, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
     def read_keypad(self):
-        for row_idx, row in enumerate(self.ROWS):
-            GPIO.output(row, GPIO.LOW)  # Activate the current row
-            for col_idx, col in enumerate(self.COLS):
-                if GPIO.input(col) == GPIO.HIGH:  # Check if the key is pressed
+        for col_idx, col in enumerate(self.COLS):
+            GPIO.output(col, GPIO.LOW)  # set output to low, one at a time
+            for row_idx, row in enumerate(self.ROWS):
+                if GPIO.input(row) == GPIO.LOW:  # Check if the key is pressed
                     key = self.KEYPAD[row_idx][col_idx]
-                    GPIO.output(row, GPIO.HIGH)  # Deactivate the row
+                    while GPIO.input(row) == GPIO.LOW:
+                        pass
+                    GPIO.output(row, GPIO.HIGH)  # Deactivate output after the key pressed
+                    sleep(0.1)
                     return key
-            GPIO.output(row, GPIO.HIGH)  # Deactivate the row
-            sleep(0.1)
+            GPIO.output(col, GPIO.HIGH)  # Deactivate the output after scan
         return None
 
     def print_keypad(self):
@@ -99,5 +101,6 @@ if __name__ == "__main__":
             keypad.print_keypad()
     except KeyboardInterrupt:
         keypad.cleanup()  # Clean up GPIO on CTRL+C exit
+        print("\nApplication stopped!")
 
 ```
