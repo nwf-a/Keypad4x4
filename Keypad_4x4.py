@@ -22,34 +22,32 @@ class Keypad:
         GPIO.setwarnings(False)
         GPIO.setmode(GPIO.BCM)
 
-        # Set column as outputs and set them to high
+        # Set column as outputs and set them to LOW
         for col in self.COLS:
-            GPIO.setup(col, GPIO.OUT)
-            GPIO.output(col, GPIO.HIGH)
+            GPIO.setup(col, GPIO.OUT, initial=GPIO.LOW)
 
-        # Set up row as inputs with pull-up resistors
+        # Set up row as inputs with pull-down resistors to avoid floating
         for row in self.ROWS:
-            GPIO.setup(row, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+            GPIO.setup(row, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
     def read_keypad(self):
         for col_idx, col in enumerate(self.COLS):
-            GPIO.output(col, GPIO.LOW)  # set output to low, one at a time
+            GPIO.output(col, GPIO.HIGH)  # set output to HIGH, one at a time
             for row_idx, row in enumerate(self.ROWS):
-                if GPIO.input(row) == GPIO.LOW:  # Check if the key is pressed
+                if GPIO.input(row) == GPIO.HIGH:  # Check if the key is pressed
+                    sleep(0.2) #Debounce time
                     key = self.KEYPAD[row_idx][col_idx]
-                    while GPIO.input(row) == GPIO.LOW:
+                    while GPIO.input(row) == GPIO.HIGH:
                         pass
-                    GPIO.output(row, GPIO.HIGH)  # Deactivate output after the key pressed
-                    sleep(0.1)
+                    GPIO.output(row, GPIO.LOW)  # Deactivate output after the key pressed
                     return key
-            GPIO.output(col, GPIO.HIGH)  # Deactivate the output after scan
+            GPIO.output(col, GPIO.LOW)  # Deactivate the output after scan the input
         return None
 
     def print_keypad(self):
         key = self.read_keypad()
         if key:
             print(f"Key Pressed: {key}")
-            sleep(0.1)  # Debounce time to avoid repeated prints
 
     def cleanup(self):
         GPIO.cleanup()  # Clean up GPIO
