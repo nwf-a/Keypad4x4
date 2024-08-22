@@ -1,39 +1,66 @@
-# Keypad 4x4
+# Interfacing a 4x4 Keypad with Raspberry Pi (Python Code)
 
-![Keypad](Images/Keypad_4x4.jpg)
+## Overview
 
-A 4x4 keypad consists of 16 buttons arranged in a grid with 4 rows and 4 columns. Each button connects a specific row and column. When a button is pressed, it connects a specific row to a column, allowing you to detect which key was pressed by checking which row and column were connected.
+| 4x4 Keypad |
+|------------|
+| ![Keypad](Images/Keypad_4x4.jpg) |
+
+A 4x4 keypad is a matrix of 16 buttons arranged in a grid with 4 rows and 4 columns. Each button connects a specific row to a column. When a button is pressed, it completes a circuit between a row and a column, allowing us to detect which key was pressed.
 
 ## Wiring
 
-The 4x4 keypad has 8 pins: 4 for the rows and 4 for the columns. Connect these pins to the GPIO pins on the Raspberry Pi.
+1. **Keypad Pins**
 
-- Keypad Pins: The first 4 pins correspond to the rows, and the next 4 correspond to the columns
+   - The first 4 pins correspond to the columns (C1 to C4).
+   - The next 4 pins correspond to the rows (R1 to R4).
 
-| Keypad Pinout | Keypad Arrangement |
-|---------------|--------------------|
-|![Keypad Pinout](Images/Keypad_pinout.jpg) | ![Keypad Arrangement](Images/keypad_arrangement.jpg) |
+    | Keypad Pinout |
+    |---------------|
+    |![Keypad Pinout](Images/Keypad_pinout.jpg) | 
 
-- Raspberry Pi GPIO Pins: Connect the keypad to any GPIO pins, but for this example, use the following configuration:
+    | Keypad Arrangement |
+    |--------------------|
+    | ![Keypad Arrangement](Images/keypad_arrangement.jpg) |
 
-![RPi GPIO Pinout](Images/Raspberry-Pi-3B+-GPIO-Pinout-Diagram.png)
+2. **Raspberry Pi GPIO Pins**
 
-![GPIO Mapping](Images/GPIO.png)
+   Connect the keypad to any GPIO pins on the Raspberry Pi. For this example, we’ll use the following configuration:
 
-| **Keypad Pins** | **Raspberry Pi GPIO Pins** |
-|-------------|------------------------|
-| Column 1 | GPIO4 |
-| Column 2 | GPIO17 |
-| Column 3 | GPIO27 |
-| Column 4 | GPIO22 |
-| Row 1 | GPIO18 |
-| Row 2 | GPIO23 |
-| Row 3 | GPIO24 |
-| Row 4 | GPIO25 |
+    | **Keypad Pins** | **Raspberry Pi GPIO Pins** | **Raspberry Pi Pin Numbers** |
+    |-----------------|----------------------------|-------------------------------|
+    | Column 1 | GPIO4 | 7 |
+    | Column 2 | GPIO17 | 11 |
+    | Column 3 | GPIO27 | 13 |
+    | Column 4 | GPIO22 | 15 |
+    | Row 1 | GPIO18 | 12 |
+    | Row 2 | GPIO23 | 16 |
+    | Row 3 | GPIO24 | 18 |
+    | Row 4 | GPIO25 | 22 |
 
-## Python Code to Interface the 4x4 Keypad
+    | Raspberry Pi GPIO Pinout |
+    |--------------------------|
+    | ![RPi GPIO Pinout](Images/Raspberry-Pi-3B+-GPIO-Pinout-Diagram.png) |
+    | ![GPIO Mapping](Images/GPIO.png) |
 
-Create a Python script to read the keypad input:
+## Python Code
+
+1. Pin Configuration
+
+    - Set the **columns** as **outputs** with an initial **LOW** value
+    - Configure the **rows** as **inputs** with **internal pull-down resistors** to prevent floating
+
+2. Scanning Process
+
+    - Activate **one column at a time** by setting it to a **HIGH** level (3.3V)
+    - Check the input on each row. If a **row** reads **HIGH**, a button is **pressed**
+    - Record the corresponding key value and deactivate the row output
+
+3. Debouncing
+
+    - Add a small delay (debounce time) after detecting a key press to prevent repeated readings due to mechanical bouncing of the button contacts.
+
+Python script to read the keypad input:
 
 ```python
 import RPi.GPIO as GPIO
@@ -60,34 +87,32 @@ class Keypad:
         GPIO.setwarnings(False)
         GPIO.setmode(GPIO.BCM)
 
-        # Set column as outputs and set them to high
+        # Set column as outputs and set them to LOW
         for col in self.COLS:
-            GPIO.setup(col, GPIO.OUT)
-            GPIO.output(col, GPIO.HIGH)
+            GPIO.setup(col, GPIO.OUT, initial=GPIO.LOW)
 
-        # Set up row as inputs with pull-up resistors
+        # Set up row as inputs with pull-down resistors to avoid floating
         for row in self.ROWS:
-            GPIO.setup(row, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+            GPIO.setup(row, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
     def read_keypad(self):
         for col_idx, col in enumerate(self.COLS):
-            GPIO.output(col, GPIO.LOW)  # set output to low, one at a time
+            GPIO.output(col, GPIO.HIGH)  # set output to HIGH, one at a time
             for row_idx, row in enumerate(self.ROWS):
-                if GPIO.input(row) == GPIO.LOW:  # Check if the key is pressed
+                if GPIO.input(row) == GPIO.HIGH:  # Check if the key is pressed
+                    sleep(0.2) #Debounce time
                     key = self.KEYPAD[row_idx][col_idx]
-                    while GPIO.input(row) == GPIO.LOW:
+                    while GPIO.input(row) == GPIO.HIGH:
                         pass
-                    GPIO.output(row, GPIO.HIGH)  # Deactivate output after the key pressed
-                    sleep(0.1)
+                    GPIO.output(row, GPIO.LOW)  # Deactivate output after the key pressed
                     return key
-            GPIO.output(col, GPIO.HIGH)  # Deactivate the output after scan
+            GPIO.output(col, GPIO.LOW)  # Deactivate the output after scan the input
         return None
 
     def print_keypad(self):
         key = self.read_keypad()
         if key:
             print(f"Key Pressed: {key}")
-            sleep(0.1)  # Debounce time to avoid repeated prints
 
     def cleanup(self):
         GPIO.cleanup()  # Clean up GPIO
