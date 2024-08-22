@@ -17,7 +17,7 @@ A 4x4 keypad is a matrix of 16 buttons arranged in a grid with 4 rows and 4 colu
 
     | Keypad Pinout |
     |---------------|
-    |![Keypad Pinout](Images/Keypad_pinout.jpg) | 
+    |![Keypad Pinout](Images/Keypad_pinout.jpg) |
 
     | Keypad Arrangement |
     |--------------------|
