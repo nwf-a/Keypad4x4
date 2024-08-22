@@ -132,5 +132,5 @@ if __name__ == "__main__":
 
 ## Source
 
-1. Matrix Keypad Pinouts : <https://learn.adafruit.com/matrix-keypad/pinouts>
-2. Raspberry Pi GPIO Pinout : <https://www.raspberrypi.com/documentation/computers/raspberry-pi.html#gpio-and-the-40-pin-header>
+1. Matrix Keypad Pinouts : [Keypad Pinouts](https://learn.adafruit.com/matrix-keypad/pinouts)
+2. Raspberry Pi GPIO Pinout : [Raspberry Pi GPIO](https://www.raspberrypi.com/documentation/computers/raspberry-pi.html#gpio-and-the-40-pin-header)
