@@ -39,7 +39,7 @@ class Keypad:
                     key = self.KEYPAD[row_idx][col_idx]
                     while GPIO.input(row) == GPIO.HIGH:
                         pass
-                    GPIO.output(row, GPIO.LOW)  # Deactivate output after the key pressed
+                    GPIO.output(col, GPIO.LOW)  # Deactivate output after the key pressed
                     return key
             GPIO.output(col, GPIO.LOW)  # Deactivate the output after scan the input
         return None
