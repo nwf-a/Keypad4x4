@@ -3,6 +3,9 @@ from time import sleep
 
 class Keypad:
     def __init__(self):
+        GPIO.setwarnings(False)
+        GPIO.setmode(GPIO.BCM)
+        
         # GPIO pin configuration
         self.ROWS = [18, 23, 24, 25]    # GPIO pins for rows
         self.COLS = [4, 17, 27, 22]      # GPIO pins for columns
@@ -14,13 +17,6 @@ class Keypad:
             [7, 8, 9, 'C'],
             ['*', 0, '#', 'D']
         ]
-
-        # Setup GPIO
-        self.setup()
-
-    def setup(self):
-        GPIO.setwarnings(False)
-        GPIO.setmode(GPIO.BCM)
 
         # Set column as outputs and set them to LOW
         for col in self.COLS:
